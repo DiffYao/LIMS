@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="bookReaderMapper">
+
+    <resultMap id="bookReaderMap" type="com.laoxu.java.bookman.model.BookReader">
+        <result property="id" column="id"/>
+        <result property="code" column="code"/>
+        <result property="name" column="name"/>
+        <result property="sex" column="sex"/>
+        <result property="phone" column="phone"/>
+        <result property="createTime" column="create_time"/>
+        <result property="creater" column="creater"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="updater" column="updater"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.laoxu.java.bookman.model.BookReader">
+        insert into tb_reader ( code, name, sex, phone, create_time, creater,update_time,updater)
+        values ( #{code}, #{name}, #{sex}, #{phone}, now(),#{creater},now(),#{updater})
+    </insert>
+
+    <update id="update" parameterType="com.laoxu.java.bookman.model.BookReader">
+      update tb_reader
+      set code=#{code},
+          name=#{name},
+          sex=#{sex},
+          phone=#{phone},
+          update_time=now(),
+          updater=#{updater}
+      where id=#{id}
+    </update>
+
+    <select id="select" parameterType="long" resultMap="bookReaderMap">
+      select * from tb_reader where id=#{id}
+    </select>
+
+    <select id="delete" parameterType="long">
+      delete from tb_reader where id=#{id}
+    </select>
+
+    <select id="deletes" parameterType="long">
+      delete from tb_reader where id IN
+        <foreach collection="array" item="id" index="index" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </select>
+
+    <select id="count" parameterType="Map" resultType="java.lang.Integer">
+        select count(*) from tb_reader
+        <where>
+            <if test="code!=null and code!=''">
+                and code = #{code}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectList" parameterType="map" resultType="com.laoxu.java.bookman.model.BookReader">
+        select id, code, name, sex, phone
+        from tb_reader
+        order by code
+    </select>
+
+    <select id="selectPageResult" parameterType="map" resultType="com.laoxu.java.bookman.model.BookReader">
+        select id, code, name, sex, phone
+        from tb_reader
+        order by code
+        limit #{offset}, #{rows}
+    </select>
+
+    <select id="countCode" parameterType="com.laoxu.java.bookman.model.BookReader" resultType="java.lang.Integer">
+        select count(*) from tb_reader where code=#{code}
+        <if test="id!=null and id!=''">
+            and id != #{id}
+        </if>
+
+    </select>
+
+
+</mapper>

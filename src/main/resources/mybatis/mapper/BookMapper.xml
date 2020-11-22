@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="bookMapper">
+
+    <resultMap id="bookMap" type="com.laoxu.java.bookman.model.Book">
+        <result property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="isbn" column="isbn"/>
+        <result property="categoryCode" column="category_code"/>
+        <result property="categoryName" column="category_name"/>
+        <result property="author" column="author"/>
+        <result property="publisherCode" column="publisher_code"/>
+        <result property="publisherName" column="publisher_name"/>
+        <result property="price" column="price"/>
+        <result property="edition" column="edition"/>
+        <result property="translator" column="translator"/>
+        <result property="languageCode" column="language_code"/>
+        <result property="languageName" column="language_name"/>
+        <result property="pages" column="pages"/>
+        <result property="words" column="words"/>
+        <result property="locationCode" column="location_code"/>
+        <result property="locationName" column="location_name"/>
+        <result property="totalNumber" column="total_number"/>
+        <result property="leftNumber" column="left_number"/>
+        <result property="description" column="description"/>
+        <result property="remark" column="remark"/>
+        <result property="imgPath" column="img_path"/>
+        <result property="registerTime" column="register_time"/>
+        <result property="createTime" column="create_time"/>
+        <result property="creater" column="creater"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="updater" column="updater"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.laoxu.java.bookman.model.Book">
+        insert into tb_book (name, isbn, category_code, category_name,author, publisher_code,publisher_name,price,edition,translator,
+        language_code,language_name,pages,words,location_code,location_name,total_number,left_number,description,remark,img_path, register_time,
+        create_time, creater,update_time,updater)
+        values ( #{name}, #{isbn}, #{categoryCode},#{categoryName}, #{author}, #{publisherCode},#{publisherName},#{price},#{edition},#{translator},
+        #{languageCode},#{languageName},#{pages},#{words},#{locationCode},#{locationName},#{totalNumber},#{leftNumber},#{description},#{remark},#{imgPath},
+        #{registerTime},now(),#{creater},now(),#{updater})
+    </insert>
+
+    <update id="update" parameterType="com.laoxu.java.bookman.model.Book">
+      update tb_book
+      set name=#{name},
+          isbn=#{isbn},
+          category_code=#{categoryCode},
+          category_name=#{categoryName},
+          author=#{author},
+          publisher_code=#{publisherCode},
+          publisher_name=#{publisherName},
+          price=#{price},
+          edition=#{edition},
+          translator=#{translator},
+          language_code=#{languageCode},
+          language_name=#{languageName},
+          pages=#{pages},
+          words=#{words},
+          location_code=#{locationCode},
+          location_name=#{locationName},
+          total_number=#{totalNumber},
+          left_number=#{leftNumber},
+          description=#{description},
+          remark=#{remark},
+          img_path=#{imgPath},
+          register_time=#{registerTime},
+          update_time=now(),
+          updater=#{updater}
+      where id=#{id}
+    </update>
+
+    <select id="select" parameterType="long" resultMap="bookMap">
+      select * from tb_book where id=#{id}
+    </select>
+
+    <select id="selectByIsbn" parameterType="string" resultMap="bookMap">
+      select * from tb_book where isbn=#{isbn} limit 1
+    </select>
+
+    <select id="delete" parameterType="long">
+      delete from tb_book where id=#{id}
+    </select>
+
+    <select id="deletes" parameterType="long">
+      delete from tb_book where id IN
+        <foreach collection="array" item="id" index="index" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </select>
+
+    <select id="count" parameterType="Map" resultType="java.lang.Integer">
+        select count(*) from tb_book
+        <where>
+            <if test="isbn!=null and isbn!=''">
+                and isbn = #{isbn}
+            </if>
+            <if test="name!=null and name!=''">
+                and name like concat('%',#{name},'%')
+            </if>
+            <if test="author!=null and author!=''">
+                and author like concat('%',#{author},'%')
+            </if>
+        </where>
+    </select>
+
+    <select id="selectList" parameterType="map" resultType="com.laoxu.java.bookman.model.Book">
+        select id, code, name
+        from tb_book
+        order by code
+    </select>
+
+    <select id="selectPageResult" parameterType="map" resultType="com.laoxu.java.bookman.model.Book">
+        select *
+        from tb_book
+        <where>
+            <if test="isbn!=null and isbn!=''">
+                and isbn = #{isbn}
+            </if>
+            <if test="name!=null and name!=''">
+                and name like concat('%',#{name},'%')
+            </if>
+            <if test="author!=null and author!=''">
+                and author like concat('%',#{author},'%')
+            </if>
+        </where>
+        limit #{offset}, #{rows}
+    </select>
+
+    <select id="countCode" parameterType="com.laoxu.java.bookman.model.Book" resultType="java.lang.Integer">
+        select count(*) from tb_book where isbn = #{isbn}
+        <if test="id!=null and id!=''">
+            and id != #{id}
+        </if>
+    </select>
+
+
+</mapper>

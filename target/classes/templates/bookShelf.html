@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>书架管理</title>
+    <link rel="stylesheet" href="/static/layui/css/layui.css" th:href="@{/static/layui/css/layui.css}">
+</head>
+
+<body>
+<!-- 内容主体区域 -->
+<div>
+    <table id="tb-bookShelf" lay-filter="tb-bookShelf"></table>
+</div>
+
+<!--编辑表单-->
+<div class="layui-row" id="editBookShelf" style="display:none;">
+    <div class="layui-col-md10">
+        <form class="layui-form layui-from-pane" id="saveBookShelf" style="margin-top:20px">
+
+            <div class="layui-form-item">
+                <label class="layui-form-label">编码</label>
+                <div class="layui-input-block">
+                    <input type="text" name="code" id="code" required lay-verify="required" autocomplete="off"
+                           class="layui-input">
+                </div>
+            </div>
+
+            <input type="text" name="id" id="id" hidden="hidden">
+
+            <div class="layui-form-item">
+                <label class="layui-form-label">名称</label>
+                <div class="layui-input-block">
+                    <input type="text" name="name" id="name" required lay-verify="required" autocomplete="off"
+                           class="layui-input">
+                </div>
+            </div>
+
+            <div class="layui-form-item" style="margin-top:40px" id="check">
+                <div class="layui-input-block">
+                    <button class="layui-btn  layui-btn-submit " lay-submit="" lay-filter="saveBookShelf">保存</button>
+                    <!--<button type="reset" class="layui-btn layui-btn-primary">重置</button>-->
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script type="text/html" id="bookShelf-toolbar">
+    <div class="layui-btn-container">
+        <button class="layui-btn layui-btn-sm" lay-event="add"><i class="layui-icon">&#xe608;</i>新增</button>
+        <button class="layui-btn layui-btn-sm layui-btn-danger" lay-event="remove"><i class="layui-icon">&#xe640;</i>删除
+        </button>
+    </div>
+</script>
+
+<script type="text/html" id="barOps">
+    <a class="layui-btn layui-btn-sm" lay-event="edit"><i class="layui-icon">&#xe642;</i> </a>
+</script>
+
+<script src="/static/js/jquery-1.11.3.min.js" th:src="@{/static/js/jquery-1.11.3.min.js}"></script>
+<script src="/static/layui/layui.all.js" th:src="@{static/layui/layui.all.js}"></script>
+<script src="/static/js/util.js" th:src="@{/static/js/util.js}"></script>
+
+<!--ctx-->
+<script th:replace="~{fragment::ctx}"/>
+
+<script>
+    var element, layer, laydate, table, form;
+
+    $(function () {
+        // 使用模块
+        layui.use(['element', 'layer', 'laydate', 'table', 'form'], function () {
+            element = layui.element;
+            layer = layui.layer;
+            laydate = layui.laydate;
+            table = layui.table;
+            form = layui.form;
+        });
+
+        //第一个实例
+        var userTable = table.render({
+            elem: '#tb-bookShelf'
+            , height: 515
+            , url: ctx+'api/bookShelf/list' //数据接口
+            , page: true //开启分页
+            , toolbar: '#bookShelf-toolbar'
+            , cols: [
+                [ //表头
+                {type: 'checkbox', fixed: 'left'}
+                , {field: 'id', title: 'ID', width: 80, sort: true, fixed: 'left',hide:true}
+                , {field: 'code', title: '编码'}
+                , {field: 'name', title: '名称'}
+                , {fixed: 'right', title: '操作', toolbar: '#barOps', width: 120}
+            ]
+            ]
+        });
+
+        //监听表单提交
+        // 修改
+        form.on('submit(saveBookShelf)', function (data) {
+            //alert(JSON.stringify(data.field));
+            $.ajax({
+                url: ctx+'api/bookShelf/save',
+                type: 'POST',
+                contentType: "application/json",
+                dataType: "json",
+                data: JSON.stringify(data.field),
+                success: function (result) {
+                    if (result.code == 200) {
+                        layer.msg("修改成功！", {icon: 6});
+                        cleanForm('#saveBookShelf');
+
+                       if(data.field.id.length>0){
+                            layer.closeAll();//关闭所有的弹出层
+                        }
+                        userTable.reload();
+                    }else {
+                        layer.alert(result.message);
+                    }
+                }
+            });
+            return false;
+        });
+
+        //工具栏事件
+        table.on('toolbar(tb-bookShelf)', function (obj) {
+            var checkStatus = table.checkStatus(obj.config.id);
+            var checkData = checkStatus.data;
+            var ids = [];
+            switch (obj.event) {
+                // 新增
+                case 'add':
+                    cleanForm('#saveBookShelf');
+                    layer.open({
+                        type: 1,
+                        offset: '10px',
+                        title: "新增书架",
+                        area: ['500px', '400px'],
+                        content: $("#editBookShelf")
+                    });
+                    break;
+                // 删除
+                case 'remove':
+                    if (checkData.length == 0) {
+                        layer.alert('请选择要操作的行');
+                    } else {
+                        layer.confirm('确定要删除吗？', function (index) {
+                            for (var i = 0; i < checkData.length; i++) {
+                                ids.push(checkData[i].id);
+                            }
+                            //layer.alert(JSON.stringify(ids));
+                            $.ajax({
+                                url: ctx+'api/bookShelf/remove',
+                                type: 'POST',
+                                contentType: "application/json",
+                                dataType: "json",
+                                data: JSON.stringify(ids),
+                                success: function (result) {
+                                    if (result.code == 200) {
+                                        setTimeout(function () {
+                                            layer.closeAll();//关闭所有的弹出层
+                                            userTable.reload();
+                                        }, 300);
+                                    }else {
+                                        layer.msg("操作失败！", {icon: 5});
+                                    }
+                                }
+                            });
+                        });
+                    }
+                    break;
+            };
+        });
+
+        // 监听工具条
+        table.on('tool(tb-bookShelf)', function (obj) {
+            var data = obj.data;
+            // 修改
+            if (obj.event === 'edit') {
+                $("#name").val(data.name);
+                $("#code").val(data.code);
+                $("#id").val(data.id);
+
+                layer.open({
+                    type: 1,
+                    offset: '10px',
+                    title: "修改书架",
+                    area: ['500px', '400px'],
+                    content: $("#editBookShelf")
+                });
+            }
+        });
+    });
+
+
+
+</script>
+</body>
+
+</html>

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="userMapper">
+
+    <resultMap id="userMap" type="com.laoxu.java.bookman.model.User">
+        <result property="username" column="username"/>
+        <result property="password" column="password"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.laoxu.java.bookman.model.User">
+        insert into tb_user
+         (
+          username,
+          password
+          )
+        values
+         (
+          #{username},
+          #{password}
+          )
+      </insert>
+
+
+    <!--激活账户，修改用户状态-->
+    <update id="update" parameterType="com.laoxu.java.bookman.model.User">
+      update tb_user
+      set username=#{username},
+          password=#{password}
+      where username=#{username}
+    </update>
+
+    <select id="delete" parameterType="long">
+      delete from tb_user where username=#{username}
+    </select>
+
+    <select id="selectUserByUsername" parameterType="string" resultType="com.laoxu.java.bookman.model.User">
+        select * from tb_user where username=#{username}
+    </select>
+
+    <select id="count" parameterType="Map" resultType="java.lang.Integer">
+        select count(*) from tb_user
+        <where>
+            <if test="username!='' and username != null">
+                username like concat('%',#{username},'%')
+            </if>
+        </where>
+    </select>
+
+    <select id="selectPageResult" parameterType="map" resultMap="userMap">
+        select * from tb_user
+        <where>
+            <if test="username!='' and username != null">
+                username like concat('%',#{username},'%')
+            </if>
+        </where>
+        limit #{offset}, #{rows}
+    </select>
+
+</mapper>

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>借还统计</title>
+    <link rel="stylesheet" href="/static/layui/css/layui.css" th:href="@{/static/layui/css/layui.css}">
+
+    <script src="/static/js/jquery-1.11.3.min.js" th:src="@{/static/js/jquery-1.11.3.min.js}"></script>
+    <script src="/static/layui/layui.all.js" th:src="@{/static/layui/layui.all.js}"></script>
+    <script src="/static/js/util.js" th:src="@{/static/js/util.js}"></script>
+    <!-- 引入 echarts.js -->
+    <script src="/static/js/echarts.min.js" th:src="@{/static/js/echarts.min.js}"></script>
+</head>
+
+<body>
+<!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+<div id="main" style="width: 800px;height:400px;">
+
+</div>
+
+<!--ctx-->
+<script th:replace="~{fragment::ctx}"/>
+
+<script type="text/javascript">
+    // 基于准备好的dom，初始化echarts实例
+    var chart = document.getElementById('main');
+    var echart = echarts.init(chart);
+
+    $(function(){
+        buildData();
+    });
+
+    //生成数据
+    function buildData()
+    {
+        var columnLabel = ['借','还'];
+        var columnName = [];
+        var columnValue = [];
+
+        echart.showLoading();
+        // 请求
+        $.ajax({
+            url: ctx+'api/bookBorrow/getBorrowStat',
+            type: 'GET',
+            contentType: "application/json",
+            dataType: "json",
+            data: "",
+            success: function (result) {
+                if (result.code == 200) {
+                    console.log(JSON.stringify(result.data.columnName));
+                    columnName = result.data.columnName;
+                    columnValue =  result.data.columnValue;
+
+                    console.log(JSON.stringify(columnValue));
+
+                    echart.hideLoading();
+                    buildChart(columnLabel,columnName,columnValue);
+                } else {
+                    layer.alert(result.message);
+                }
+            }
+        });
+
+        /*for(var i=0;i<columLabel.length;i++)
+        {
+            for(var j=0;j<columName.length;j++)
+            {
+                arrData.push(Math.floor(Math.random()*1000+1000*j-1000*i));
+            }
+            console.info(arrData);
+            columnValue.push(eval('(' + ("{'name':'"+columLabel[i]+"','type':'bar','data':["+arrData+"]}") + ')'));
+        }*/
+
+
+    }
+
+    //生成图形
+    function buildChart(columnLabel,columnName,columnValue)
+    {
+
+        var option = {
+            title: {
+                text: '一周借还统计'
+            },
+            tooltip : {
+                trigger: 'axis',
+                axisPointer : {
+                    type : 'shadow'
+                }
+            },
+            toolbox: {
+                show : true,
+                feature : {
+                    saveAsImage : {show: true}
+                }
+            },
+            legend: {
+                data:columnLabel
+            },
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true
+            },
+            xAxis : [
+                {
+                    min:0,
+                    type : 'category',
+                    data : columnName
+                }
+            ],
+            yAxis : [
+                {
+                    min:0,
+                    type : 'value'
+                }
+            ],
+            series : columnValue
+        };
+
+        echart.setOption(option);
+    }
+
+
+</script>
+
+
+</body>
+
+</html>
