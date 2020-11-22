@@ -16,6 +16,7 @@ com\laoxu\java\bookman\controller\UserController.class
 com\laoxu\java\bookman\controller\BookBorrowController.class
 com\laoxu\java\bookman\config\WebMvcConfig.class
 com\laoxu\java\bookman\common\SecurityUtil.class
+com\laoxu\java\bookman\service\QRCodeService.class
 com\laoxu\java\bookman\service\UserService.class
 com\laoxu\java\bookman\controller\BookCategoryController.class
 com\laoxu\java\bookman\common\IpUtil.class

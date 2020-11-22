@@ -58,6 +58,15 @@
             vertical-align: center;
         }
 
+        .items .cover2 img {
+            padding: 20px;
+            height: 200px;
+            width: 200px;
+            text-align: right;
+            vertical-align: bottom;
+
+        }
+
         .items .itemtitle {
             margin-bottom: 30px;
             vertical-align: left;
@@ -105,6 +114,9 @@
         <div class="layui-form-item">
             <button class="layui-btn layui-btn-submit" lay-submit="" lay-filter="formDemo">搜索</button>
         </div>
+        <div class="layui-form-item2">
+            <button class="layui-btn layui-btn-submit2" lay-submit="" lay-filter="formDemo2">生成二维码</button>
+        </div>
     </form>
 
     <!-- 列表 -->
@@ -114,6 +126,7 @@
         <!--分页-->
         <div id="pager"></div>
     </div>
+
 </div>
 
 <script src="/static/js/jquery-1.11.3.min.js" th:src="@{/static/js/jquery-1.11.3.min.js}"></script>
@@ -127,11 +140,29 @@
     var form, laypage;
     // 请求参数
     var param = {};
+    var param2 = {};
 
     layui.use(['form','laypage','jquery'], function () {
         form = layui.form;
         laypage = layui.laypage, $ = layui.$;
 
+        form.on('submit(formDemo2)', function (data){
+            param2.name = "";
+            param2.isbn = "";
+            param2.categoryName = "";
+            if (data.field.condition == "isbn") {
+                param2.isbn = data.field.keyword;
+            }
+            if (data.field.condition == "name") {
+                param2.name = data.field.keyword;
+            }
+            if (data.field.condition == "categoryName") {
+                param2.categoryName = data.field.keyword;
+            }
+            showRecord2(1,5,param2);
+
+            return false;
+        });
         //监听提交
         form.on('submit(formDemo)', function (data) {
             param.name = "";
@@ -147,13 +178,31 @@
             if (data.field.condition == "categoryName") {
                 param.categoryName = data.field.keyword;
             }
-
             showRecord(1,5,param);
 
             return false;
+
         });
+
     });
 
+    function showRecord2(pageNo, pageSize, param) {
+        $.get(ctx+"api/book/list",
+            {
+                categoryName: param.categoryName,
+                name: param.name,
+                isbn: param.isbn,
+                page: pageNo,
+                limit: pageSize
+            },
+            function (result) {
+                //console.log(JSON.stringify(result));
+                // 展示数据
+                fillPage2(pageNo, pageSize, result.data);
+                // 渲染分页;
+            }
+        );
+    }
 
     function showRecord(pageNo, pageSize, param) {
         $.get(ctx+"api/book/list",
@@ -208,6 +257,30 @@
                 fillPage(pageNo, pageSize, result.data);
             }
         );
+    }
+
+    function fillPage2(pageNo, pageSize, data) {
+        var start=pageNo==1?1:(pageNo-1)*pageSize+1;
+        $('.items').empty();
+        //加载后台返回的List集合数据
+        var href="";
+        var temp="";
+        for (var i = 0; i < data.length; i++) {
+            href=ctx+"bookDetail/"+data[i].id;
+            temp = data[i].imgPath;
+            var td = $("<td class='col'></td>").text(data[i].name);
+            var td2;
+            //td2 = $("<td class='cover2'><a href='"+href+"' target='_blank'><img src='static/img/bookDetail/"+data[i].id+".png'></a></td>");
+            td2 = $("<td class='cover2'><a href='"+href+"' target='_blank'><img src='static/img/bookDetail/Qrcode_"+data[i].id+".png'></a></td>");
+            /*if(isEmpty(data[i].imgPath)){
+                td2 = $("<td class='cover2'><a href='"+href+"' target='_blank'><img src='static/img/nopic.png'></a></td>");
+            }else{
+                td2 = $("<td class='cover2'><a href='"+href+"' target='_blank'><img src='static/img/"+data[i].imgPath+"/.png'></a></td>");
+            }*/
+            var tr = $("<tr class='item'></tr>").append(td, td2);
+
+            $('.items').append(tr);
+        }
     }
 
     function fillPage(pageNo, pageSize, data) {
