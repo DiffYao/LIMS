@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * @Description: 读者控制器
@@ -23,6 +24,10 @@ public class BookReaderController {
     @Autowired
     BookReaderService bookReaderService;
 
+    public static boolean validateMobilePhone(String in) {
+        Pattern pattern = Pattern.compile("^[1]\\d{10}$");
+        return pattern.matcher(in).matches();
+    }
     /**
      * 保存（新增/修改）
      *
@@ -34,6 +39,10 @@ public class BookReaderController {
         int count = bookReaderService.checkCode(entity);
         if(count>0){
             return ResultUtil.fail("编码已存在！");
+        }
+
+        if(!validateMobilePhone(entity.getPhone())){
+            return ResultUtil.fail("手机号格式不正确！");
         }
         if(entity.getId()!=null){
             bookReaderService.modify(entity);
