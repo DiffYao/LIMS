@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>图书管理</title>
+    <link rel="stylesheet" href="/static/layui/css/layui.css" th:href="@{/static/layui/css/layui.css}">
+</head>
+
+<body>
+<input type="text" id="ctx" hidden="hidden" th:value="${#request.getContextPath()}">
+<!-- 内容主体区域 -->
+<div>
+    <div class="search-div">
+        <div class="">
+            <div class="layui-inline">
+                <label class="layui-form-label">名称：</label>
+                <div class="layui-input-inline">
+                <input class="layui-input" id="name" name="name" autocomplete="off">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">编号：</label>
+                <div class="layui-input-inline">
+                    <input class="layui-input" id="isbn" name="isbn" autocomplete="off">
+                </div>
+            </div>
+<!--            <div class="layui-inline">-->
+<!--                <label class="layui-form-label">作者：</label>-->
+<!--                <div class="layui-input-inline">-->
+<!--                    <input class="layui-input" id="author" name="author" autocomplete="off">-->
+<!--                </div>-->
+<!--            </div>-->
+
+            <button class="layui-btn" data-type="reload" id="search">搜索</button>
+        </div>
+
+    </div>
+
+    <table id="tb-book" lay-filter="tb-book"></table>
+
+</div>
+
+<!--编辑表单-->
+<script type="text/html" id="book-toolbar">
+    <div class="layui-btn-container">
+        <button class="layui-btn layui-btn-sm" lay-event="add"><i class="layui-icon">&#xe608;</i>新增</button>
+        <button class="layui-btn layui-btn-sm layui-btn-danger" lay-event="remove"><i class="layui-icon">&#xe640;</i>删除
+        </button>
+        <button class="layui-btn layui-btn-sm" lay-event="refresh"><i class="layui-icon">&#xe666;</i>刷新
+        </button>
+    </div>
+    <!--<div class="layui-btn-container">
+        <button class="layui-btn layui-btn-sm" lay-event="getCheckData">获取选中行数据</button>
+        <button class="layui-btn layui-btn-sm" lay-event="getCheckLength">获取选中数目</button>
+        <button class="layui-btn layui-btn-sm" lay-event="isAll">验证是否全选</button>
+    </div>-->
+</script>
+
+<script type="text/html" id="barOps">
+    <a class="layui-btn layui-btn-sm" lay-event="edit"><i class="layui-icon">&#xe642;</i> </a>
+</script>
+
+<script src="/static/js/jquery-1.11.3.min.js" th:src="@{/static/js/jquery-1.11.3.min.js}"></script>
+<script src="/static/layui/layui.all.js" th:src="@{static/layui/layui.all.js}"></script>
+<script src="/static/js/util.js" th:src="@{/static/js/util.js}"></script>
+
+<!--ctx-->
+<script th:replace="~{fragment::ctx}"/>
+
+<script>
+    var element, layer, laydate, table, form,userTable;
+
+
+    function reload(){
+        userTable.reload();
+    }
+
+    $(function () {
+        // 使用模块
+        layui.use(['element', 'layer', 'laydate', 'table', 'form'], function () {
+            element = layui.element;
+            layer = layui.layer;
+            laydate = layui.laydate;
+            table = layui.table;
+            form = layui.form;
+        });
+
+        //第一个实例
+         userTable = table.render({
+            elem: '#tb-book'
+            , height: 515
+            , url: ctx+'api/book/list' //数据接口
+            , page: true //开启分页
+            , toolbar: '#book-toolbar'
+             ,id: 'tb-book'
+            /*,request: {
+                pageName: 'pageNo' //页码的参数名称，默认：page
+                ,limitName: 'pageSize' //每页数据量的参数名，默认：limit
+            }
+            , response: {
+                statusName: 'code', //规定返回的状态码字段为code
+                statusCode: 200 //规定成功的状态码为200，默认为0
+            }
+            , parseData: function (res) {
+                 return {
+                     "code": res.code, //解析接口状态
+                     "msg": res.msg, //解析提示文本
+                     "count": res.records, //解析数据长度
+                     "data": res.rows //解析数据列表
+                 }
+             }*/
+            , cols: [
+                [ //表头
+                {type: 'checkbox', fixed: 'left'}
+                , {field: 'id', title: 'ID', width: 80, sort: true, fixed: 'left',hide:true}
+                , {field: 'name', title: '试剂名称', width: 180}
+                , {field: 'isbn', title: '试剂编码', width: 160}
+                //, {field: 'author', title: '作者', width: 80}
+                //, {field: 'translator', title: '译者', width: 80}
+                , {field: 'categoryName', title: '试剂分类', width: 160}
+                , {field: 'price', title: '试剂单价', width: 120}
+                , {field: 'totalNumber', title: '试剂数量', width: 120}
+                , {field: 'leftNumber', title: '剩余量', width: 120}
+                , {field: 'publisherName', title: '制造商', width: 180}
+                //, {field: 'pages', title: '页数', width: 80}
+                //, {field: 'words', title: '字数', width: 80}
+                , {field: 'locationName', title: '存放位置', width: 120}
+                //, {field: 'edition', title: '版次', width: 80}
+                , {field: 'registerTime', title: '登记日期', width: 120}
+                , {field: 'remark', title: '备注', width: 180}
+                , {fixed: 'right', title: '操作', toolbar: '#barOps', width: 120}
+            ]
+             ]
+        });
+
+        //监听表单提交
+        // 修改
+        form.on('submit(saveBook)', function (data) {
+            layer.alert(JSON.stringify(data.field));
+            $.ajax({
+                url: ctx+'api/book/save',
+                type: 'POST',
+                contentType: "application/json",
+                dataType: "json",
+                data: JSON.stringify(data.field),
+                success: function (result) {
+                    if (result.code == 200) {
+                        // layer.msg("修改成功！", {icon: 6});
+                        cleanForm("#saveBook");
+                        if(data.field.id.length>0){
+                            layer.closeAll();//关闭所有的弹出层
+                        }
+                        userTable.reload();
+                    }else {
+                        layer.alert(result.message);
+                    }
+                }
+            });
+
+            return false;
+
+        });
+
+        //工具栏事件
+        table.on('toolbar(tb-book)', function (obj) {
+            var checkStatus = table.checkStatus(obj.config.id);
+            var checkData = checkStatus.data;
+            var ids = [];
+            switch (obj.event) {
+                // 新增
+                case 'add':
+                    cleanForm("#saveBook");
+
+                    top.layer.open({
+                        type: 2,
+                        offset: '10px',
+                        title: "新增试剂",
+                        area: ['800px', '660px'],
+                        content: ['bookAdd']
+                    });
+
+
+                    break;
+                // 删除
+                case 'remove':
+                    if (checkData.length == 0) {
+                        layer.alert('请选择要操作的行');
+                    } else {
+                        layer.confirm('确定要删除吗？', function (index) {
+                            for (var i = 0; i < checkData.length; i++) {
+                                ids.push(checkData[i].id);
+                            }
+                            //layer.alert(JSON.stringify(ids));
+                            $.ajax({
+                                url: ctx+'api/book/remove',
+                                type: 'POST',
+                                contentType: "application/json",
+                                dataType: "json",
+                                data: JSON.stringify(ids),
+                                success: function (result) {
+                                    if (result.code == 200) {
+                                        setTimeout(function () {
+                                            layer.closeAll();//关闭所有的弹出层
+                                            userTable.reload();
+                                        }, 300);
+                                    }else {
+                                        layer.msg("操作失败！", {icon: 5});
+                                    }
+                                }
+                            });
+                        });
+                    }
+                    break;
+                case 'refresh':
+                    userTable.reload();
+                    break;
+                case 'getCheckData':
+                    layer.alert(JSON.stringify(data));
+                    break;
+                case 'getCheckLength':
+                    var data = checkStatus.data;
+                    layer.msg('选中了：' + data.length + ' 个');
+                    break;
+                case 'isAll':
+                    layer.msg(checkStatus.isAll ? '全选' : '未全选')
+                    break;
+            }
+            ;
+        });
+
+        // 监听工具条
+        table.on('tool(tb-book)', function (obj) {
+            var data = obj.data;
+            // 修改
+            if (obj.event === 'edit') {
+                top.layer.open({
+                    type: 2,
+                    offset: '10px',
+                    title: "修改图书",
+                    area: ['800px', '660px'],
+                    content: [ctx+'bookEdit/'+data.id]
+                });
+            }
+        });
+
+        // 搜索
+        $('#search').click(function () {
+            var name = $('#name').val();
+            var isbn = $('#isbn').val();
+            var author = $('#author').val();
+            table.reload('tb-book', {
+                url: ctx+'api/book/list'
+                ,where: {
+                    name:name,isbn:isbn,author:author
+                }
+                ,page: {
+                    curr: 1
+                }
+            });
+        });
+    });
+
+
+
+</script>
+</body>
+
+</html>

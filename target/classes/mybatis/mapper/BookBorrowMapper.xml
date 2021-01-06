@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="bookBorrowMapper">
+
+    <resultMap id="bookBorrowMap" type="com.laoxu.java.bookman.vo.BookBorrowVO">
+        <result property="id" column="id"/>
+        <result property="readerCode" column="reader_code"/>
+        <result property="readerName" column="reader_name"/>
+        <result property="readerSex" column="reader_sex"/>
+        <result property="readerPhone" column="reader_phone"/>
+        <result property="bookIsbn" column="book_isbn"/>
+        <result property="bookName" column="book_name"/>
+        <result property="bookCategory" column="book_category"/>
+        <result property="bookLocation" column="book_location"/>
+        <result property="bookTotal" column="book_total"/>
+        <result property="bookLeft" column="book_left"/>
+        <result property="borrowDate" column="borrow_date"/>
+        <result property="returnDate" column="return_date"/>
+        <result property="realReturnDate" column="real_return_date"/>
+        <result property="borrowDays" column="borrow_days"/>
+        <result property="reBorrowDays" column="reborrow_days"/>
+        <result property="borrowStatus" column="borrow_status"/>
+        <result property="remark" column="remark"/>
+        <result property="createTime" column="create_time"/>
+        <result property="creater" column="creater"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="updater" column="updater"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.laoxu.java.bookman.vo.BookBorrowVO">
+        insert into tb_borrow (reader_code, book_isbn, borrow_date,return_date,borrow_days,remark,create_time, creater,update_time,updater)
+        values ( #{readerCode}, #{bookIsbn}, #{borrowDate},#{returnDate}, #{borrowDays}, #{remark},now(),#{creater},now(),#{updater})
+    </insert>
+
+    <update id="update" parameterType="com.laoxu.java.bookman.vo.BookBorrowVO">
+      update tb_borrow
+      set reader_code=#{readerCode},
+          book_isbn=#{bookIsbn},
+          borrow_date=#{borrowDate},
+          return_date=#{returnDate},
+          real_return_date=#{realReturnDate},
+          borrow_days=#{borrowDays},
+          reborrow_days = #{reBorrowDays},
+          borrow_status = #{borrowStatus},
+          remark=#{remark},
+          update_time=now(),
+          updater=#{updater}
+      where id=#{id}
+    </update>
+
+    <select id="select" parameterType="long" resultMap="bookBorrowMap">
+      select  t1.id,
+               t1.reader_code,
+               t3.name as reader_name,
+               t3.sex as reader_sex,
+               t3.phone as reader_phone,
+               t1.book_isbn,
+               t2.name as book_name,
+               t2.author as book_author,
+               t2.category_name as book_category,
+               t2.location_name as book_location,
+               t2.total_number as book_total,
+               t2.left_number as book_left,
+               t1.borrow_date,
+               t1.return_date,
+               t1.real_return_date,
+               t1.borrow_days,
+               t1.reborrow_days,
+               t1.borrow_status,
+               t1.create_time,
+               t1.creater,
+               t1.update_time,
+               t1.updater
+        from tb_borrow t1, tb_book t2, tb_reader t3
+        where t1.book_isbn = t2.isbn
+        and t1.reader_code = t3.code
+        and t1.id=#{id}
+    </select>
+
+    <select id="delete" parameterType="long">
+      delete from tb_borrow where id=#{id}
+    </select>
+
+    <select id="deletes" parameterType="long">
+      delete from tb_borrow where id IN
+        <foreach collection="array" item="id" index="index" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </select>
+
+    <update id="return" parameterType="map">
+      update tb_borrow
+      set real_return_date=curdate() ,
+          borrow_status = #{borrowStatus},
+          update_time=now(),
+          updater=#{updater}
+      where id in
+        <foreach collection="ids" item="id" index="index" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </update>
+
+    <select id="count" parameterType="Map" resultType="java.lang.Integer">
+        select count(*) from tb_borrow
+        <where>
+            <if test="borrowStatus!=null">
+                and borrow_status = #{borrowStatus}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectList" parameterType="map" resultType="com.laoxu.java.bookman.model.BookBorrow">
+        select *
+        from tb_borrow
+        <where>
+            <if test="borrowStatus!=null">
+                and borrow_status in
+                <foreach collection="borrowStatus" item="status" index="index" open="(" close=")" separator=",">
+                    #{status}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+    <select id="selectPageResult" parameterType="map" resultMap="bookBorrowMap">
+        select t1.id,
+               t1.reader_code,
+               t3.name as reader_name,
+               t3.sex as reader_sex,
+               t3.phone as reader_phone,
+               t1.book_isbn,
+               t2.name as book_name,
+               t2.author as book_author,
+               t2.category_name as book_category,
+               t2.location_name as book_location,
+               t2.total_number as book_total,
+               t2.left_number as book_left,
+               t1.borrow_date,
+               t1.return_date,
+               t1.real_return_date,
+               t1.borrow_days,
+               t1.reborrow_days,
+               t1.borrow_status,
+               t1.create_time,
+               t1.creater,
+               t1.update_time,
+               t1.updater
+        from tb_borrow t1, tb_book t2, tb_reader t3
+        where t1.book_isbn = t2.isbn
+        and t1.reader_code = t3.code
+        <if test="borrowStatus!=null">
+            and borrow_status in
+            <foreach collection="borrowStatus" item="status" index="index" open="(" close=")" separator=",">
+                #{status}
+            </foreach>
+        </if>
+        <if test="readerCode!=null and readerCode!=''">
+            and t1.reader_code = #{readerCode}
+        </if>
+        <if test="isbn!=null and isbn!=''">
+            and t1.book_isbn = #{isbn}
+        </if>
+        limit #{offset}, #{rows}
+    </select>
+
+    <select id="countBorrow" parameterType="com.laoxu.java.bookman.model.BookBorrow" resultType="java.lang.Integer">
+        select count(*) from tb_borrow where borrow_status in (0,2)
+            <if test="readerCode!=null and readerCode!=''">
+                and reader_code = #{readerCode}
+            </if>
+            <if test="bookIsbn!=null and bookIsbn!=''">
+                and book_isbn = #{bookIsbn}
+            </if>
+            <if test="id!=null and id!=''">
+                and id != #{id}
+            </if>
+    </select>
+
+    <select id="selectBorrowCount" resultType="java.lang.Integer">
+        select count(*) from tb_borrow where borrow_date = #{date}
+    </select>
+
+    <select id="selectReturnCount" resultType="java.lang.Integer">
+        select count(*) from tb_borrow where real_return_date = #{date}
+    </select>
+
+
+</mapper>

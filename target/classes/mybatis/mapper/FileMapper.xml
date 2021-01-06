@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="fileMapper">
+
+    <resultMap id="fileMap" type="com.laoxu.java.bookman.model.FileModel">
+        <result property="fileId" column="file_id"/>
+        <result property="objectType" column="object_type"/>
+        <result property="objectId" column="object_id"/>
+        <result property="fileName" column="file_name"/>
+        <result property="fileExtension" column="file_extension"/>
+        <result property="fileSize" column="file_size"/>
+        <result property="filePath" column="file_path"/>
+        <result property="uploadTime" column="upload_time"/>
+        <result property="uploader" column="uploader"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.laoxu.java.bookman.model.FileModel">
+        insert into tb_file (file_id,object_type,object_id,file_name,file_extension,file_size,file_path,upload_time,uploader)
+        values (#{fileId}, #{objectType}, #{objectId},#{fileName},#{fileExtension},#{fileSize},#{filePath},now(),#{uploader})
+    </insert>
+
+
+    <select id="select" parameterType="String" resultMap="fileMap">
+      select * from tb_file where file_id=#{fileId}
+    </select>
+
+    <select id="delete" parameterType="long">
+      delete from tb_file where file_id=#{fileId}
+    </select>
+
+
+    <select id="count" parameterType="Map" resultType="java.lang.Integer">
+        select count(*) from tb_file
+        <where>
+            <if test="objectId!=null">
+                and object_id = #{objectId}
+            </if>
+        </where>
+    </select>
+
+
+</mapper>

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>续借图书</title>
+    <link rel="stylesheet" href="/static/layui/css/layui.css" th:href="@{/static/layui/css/layui.css}">
+
+</head>
+
+<body>
+<!-- 内容主体区域 -->
+<div>
+    <!--<div class="demoTable" style="padding: 15px">
+        搜索：
+        <div class="layui-inline">
+            <input class="layui-input" id="find" autocomplete="off">
+        </div>
+        <button class="layui-btn" data-type="reload" id="queryRole">搜索</button>
+    </div>-->
+
+    <table id="tb_bookBorrow" lay-filter="tb_bookBorrow"></table>
+
+</div>
+
+<!--编辑表单-->
+<script type="text/html" id="book-toolbar">
+    <!--<div class="layui-btn-container">
+        <button class="layui-btn layui-btn-sm" lay-event="add"><i class="layui-icon">&#xe608;</i>新增</button>
+        <button class="layui-btn layui-btn-sm layui-btn-danger" lay-event="remove"><i class="layui-icon">&#xe640;</i>删除
+        </button>
+    </div>-->
+    <!--<div class="layui-btn-container">
+        <button class="layui-btn layui-btn-sm" lay-event="getCheckData">获取选中行数据</button>
+        <button class="layui-btn layui-btn-sm" lay-event="getCheckLength">获取选中数目</button>
+        <button class="layui-btn layui-btn-sm" lay-event="isAll">验证是否全选</button>
+    </div>-->
+</script>
+
+<script type="text/html" id="barOps">
+    <a class="layui-btn layui-btn-sm" lay-event="edit"><i class="layui-icon">&#xe642;</i> </a>
+</script>
+
+<script src="/static/js/jquery-1.11.3.min.js" th:src="@{/static/js/jquery-1.11.3.min.js}"></script>
+<script src="/static/layui/layui.all.js" th:src="@{static/layui/layui.all.js}"></script>
+<script src="/static/js/util.js" th:src="@{/static/js/util.js}"></script>
+
+<!--ctx-->
+<script th:replace="~{fragment::ctx}"/>
+
+<script>
+    var element, layer, laydate, table, form,userTable;
+
+    function reload(){
+        userTable.reload();
+    }
+
+    $(function () {
+        // 使用模块
+        layui.use(['element', 'layer', 'laydate', 'table', 'form'], function () {
+            element = layui.element;
+            layer = layui.layer;
+            laydate = layui.laydate;
+            table = layui.table;
+            form = layui.form;
+        });
+
+        //第一个实例
+         userTable = table.render({
+            elem: '#tb_bookBorrow'
+            , height: 515
+            , url: ctx+'api/bookBorrow/getPageResult' //数据接口
+            , page: true //开启分页
+            , toolbar: '#book-toolbar'
+            /*,request: {
+                pageName: 'pageNo' //页码的参数名称，默认：page
+                ,limitName: 'pageSize' //每页数据量的参数名，默认：limit
+            }
+            , response: {
+                statusName: 'code', //规定返回的状态码字段为code
+                statusCode: 200 //规定成功的状态码为200，默认为0
+            }
+            , parseData: function (res) {
+                 return {
+                     "code": res.code, //解析接口状态
+                     "msg": res.msg, //解析提示文本
+                     "count": res.records, //解析数据长度
+                     "data": res.rows //解析数据列表
+                 }
+             }*/
+            , cols: [
+                [ //表头
+                {type: 'checkbox', fixed: 'left'}
+                , {field: 'id', title: 'ID', width: 80, sort: true, fixed: 'left',hide:true}
+                , {field: 'borrowStatus', title: '状态', width: 80,hide:true}
+                , {field: 'readerCode', title: '读者编码', width: 160}
+                , {field: 'readerName', title: '读者姓名', width: 160}
+                , {field: 'readerSex', title: '读者性别', width: 120}
+                , {field: 'readerPhone', title: '读者电话', width: 160}
+                , {field: 'bookIsbn', title: '图书ISBN', width: 160}
+                , {field: 'bookName', title: '图书名称', width: 160}
+                , {field: 'bookAuthor', title: '图书作者', width: 120}
+                , {field: 'bookCategory', title: '图书分类', width: 120}
+                , {field: 'bookLocation', title: '图书位置', width: 180}
+                , {field: 'bookTotal', title: '图书数量', width: 120}
+                , {field: 'bookLeft', title: '图书剩余', width: 120}
+                , {field: 'borrowDate', title: '借阅日期', width: 120,templet:'<div>{{ layui.util.toDateString(d.borrowDate, "yyyy-MM-dd") }}</div>'}
+                , {field: 'returnDate', title: '应还日期', width: 120,templet:'<div>{{ layui.util.toDateString(d.returnDate, "yyyy-MM-dd") }}</div>'}
+                , {field: 'borrowDays', title: '借阅天数', width: 120}
+                , {field: 'remark', title: '备注', width: 180}
+                , {fixed: 'right', title: '操作', toolbar: '#barOps', width: 120}
+            ]
+             ]
+        });
+
+
+        //工具栏事件
+
+        // 监听工具条
+        table.on('tool(tb_bookBorrow)', function (obj) {
+            var data = obj.data;
+            // 修改
+            if (obj.event === 'edit') {
+                top.layer.open({
+                    type: 2,
+                    offset: '10px',
+                    title: "修改借阅",
+                    area: ['800px', '680px'],
+                    content: [ctx+'bookReBorrowEdit/'+data.id]
+                });
+            }
+        });
+    });
+
+
+
+</script>
+</body>
+
+</html>

@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html  xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>续借编辑</title>
+    <link rel="stylesheet" href="/static/layui/css/layui.css" th:href="@{/static/layui/css/layui.css}">
+
+    <style type="text/css">
+
+    </style>
+</head>
+
+<body style="width: 800px;height: 600px;">
+<!--编辑表单-->
+<div id="editBook">
+    <form class="layui-form" id="saveBookBorrow" style="margin-top:10px">
+        <input type="hidden" name="id" id="id" th:value="${bookBorrow.id}">
+        <input type="hidden" name="borrowStatus" id="borrowStatus" th:value="${bookBorrow.borrowStatus}">
+
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label">读者编号</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="readerCode" id="readerCode" required lay-verify="required" autocomplete="off"
+                           class="layui-input  layui-disabled" placeholder="必填" th:value="${bookBorrow.readerCode}">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">图书ISBN</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="bookIsbn" id="bookIsbn" required lay-verify="required" autocomplete="off"
+                           class="layui-input  layui-disabled" placeholder="必填" th:value="${bookBorrow.bookIsbn}">
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label">读者姓名</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="readerName" id="readerName" class="layui-input layui-disabled" th:value="${bookBorrow.readerName}">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">图书名称</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="bookName" id="bookName" class="layui-input layui-disabled" th:value="${bookBorrow.bookName}">
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label">读者性别</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="readerSex" id="readerSex" class="layui-input layui-disabled" th:value="${bookBorrow.readerSex}">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">图书作者</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="bookAuthor" id="bookAuthor" class="layui-input layui-disabled" th:value="${bookBorrow.bookAuthor}">
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label">读者电话</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="readerPhone" id="readerPhone" class="layui-input layui-disabled" th:value="${bookBorrow.readerPhone}">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">图书分类</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="bookCategory" id="bookCategory" class="layui-input layui-disabled" th:value="${bookBorrow.bookCategory}">
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label">借出日期</label>
+                <div class="layui-inline">
+                    <input type="text" name="borrowDate" id="borrowDate" required lay-verify="required" autocomplete="off"
+                           class="layui-input  layui-disabled" th:value="${#dates.format(bookBorrow.borrowDate,'yyyy-MM-dd')}">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">图书位置</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="bookLocation" id="bookLocation" class="layui-input layui-disabled" th:value="${bookBorrow.bookLocation}">
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label">应还日期</label>
+                <div class="layui-inline">
+                    <input type="text" name="returnDate" id="returnDate" required lay-verify="required" autocomplete="off"
+                           class="layui-input layui-disabled" th:value="${#dates.format(bookBorrow.returnDate,'yyyy-MM-dd')}">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">图书数量</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="bookTotal" id="bookTotal" class="layui-input layui-disabled" th:value="${bookBorrow.bookTotal}">
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label">借阅天数</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="borrowDays" id="borrowDays" class="layui-input layui-disabled" th:value="${bookBorrow.borrowDays}">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">图书剩余</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="bookLeft" id="bookLeft" class="layui-input layui-disabled" th:value="${bookBorrow.bookLeft}">
+                </div>
+            </div>
+        </div>
+
+        <div class="layui-form-item layui-form-text">
+            <div class="layui-inline">
+                <label class="layui-form-label">续借天数</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="reBorrowDays" id="reBorrowDays" class="layui-input"  lay-verify="number|integer" value="0">
+                </div>
+            </div>
+
+            <div class="layui-inline">
+                <label class="layui-form-label">备注</label>
+                <div class="layui-input-block">
+                    <textarea name="remark" placeholder="请输入内容" class="layui-textarea  layui-disabled" th:text="${bookBorrow.remark}"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <div class="layui-form-item" style="margin-top:40px" id="check">
+            <div class="layui-input-block">
+                <button class="layui-btn  layui-btn-submit " lay-submit="" lay-filter="saveBookBorrow">保存</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+
+<script src="/static/js/jquery-1.11.3.min.js" th:src="@{/static/js/jquery-1.11.3.min.js}"></script>
+<script src="/static/layui/layui.all.js" th:src="@{/static/layui/layui.all.js}"></script>
+<script src="/static/js/util.js" th:src="@{/static/js/util.js}"></script>
+
+<!--ctx-->
+<script th:replace="~{fragment::ctx}"/>
+
+<script>
+    var element, layer, laydate, form;
+
+    var reBorrowDays = $("#reBorrowDays").val();
+    var borrowDays = $("#borrowDays").val();
+    var borrowDays1, returnDate;
+
+    $(function () {
+        // 使用模块
+        layui.use(['element', 'layer', 'laydate', 'form'], function () {
+            element = layui.element;
+            layer = layui.layer;
+            laydate = layui.laydate;
+            form = layui.form;
+        });
+
+        $("#reBorrowDays").on(" input propertychange",function(){
+            calc();
+        });
+
+        // 根据续借天数计算 还书日期
+        calc();
+        // 监听表单提交
+        // 修改
+        form.on('submit(saveBookBorrow)', function (data) {
+            console.log(JSON.stringify(data.field));
+            $.ajax({
+                url: ctx+'api/bookBorrow/save',
+                type: 'POST',
+                async: false,
+                contentType: "application/json",
+                dataType: "json",
+                data: JSON.stringify(data.field),
+                success: function (result) {
+                    if (result.code == 200) {
+                        cleanForm("#saveBookBorrow");
+                        top.$(".layui-show").find("iframe")[0].contentWindow.userTable.reload();
+                        top.layer.closeAll();//关闭所有的弹出层
+                    } else {
+                        layer.alert(result.message);
+                    }
+                }
+            });
+
+            return false;
+
+        });
+    });
+
+    function calc() {
+        reBorrowDays = $("#reBorrowDays").val();
+        returnDate = dateAddDays($("#returnDate").val(),reBorrowDays);
+        borrowDays1 = parseInt(borrowDays) + parseInt(reBorrowDays); //?
+
+        $("#borrowDays").val(borrowDays1);
+        $("#returnDate").val(returnDate);
+
+        console.log(returnDate);
+        console.log(borrowDays);
+    }
+
+</script>
+</body>
+
+</html>

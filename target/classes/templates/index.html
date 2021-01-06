@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>搜索试剂</title>
+
+    <link rel="stylesheet" href="/static/layui/css/layui.css" th:href="@{/static/layui/css/layui.css}">
+
+    <style type="text/css">
+        .main {
+            width: 40%;
+            margin: 50px auto;
+            text-align: center;
+        }
+
+        .site-h1 {
+            margin-bottom: 20px;
+            line-height: 60px;
+            padding-bottom: 10px;
+            color: #393D49;
+            font-size: 28px;
+            font-weight: 300;
+        }
+
+        .site-h1 .layui-icon {
+            position: relative;
+            top: 5px;
+            font-size: 35px;
+            margin-right: 10px;
+        }
+
+        .input-opt {
+            float: left;
+            width: 15%;
+        }
+
+        .input-text {
+            float: right;
+            width: 84%;
+        }
+
+        .items {
+            margin: 50px 0;
+        }
+
+        .items .col1 {
+            width: 40px;
+            text-align: left;
+        }
+
+        .items .cover img {
+            padding: 10px;
+            height: 80px;
+            width: 75px;
+            text-align: center;
+            vertical-align: center;
+        }
+
+        .items .cover2 img {
+            padding: 20px;
+            height: 200px;
+            width: 200px;
+            text-align: right;
+            vertical-align: bottom;
+
+        }
+
+        .items .itemtitle {
+            margin-bottom: 30px;
+            vertical-align: left;
+            font-size: 16px;
+            font-weight: normal;
+        }
+
+        .items .content {
+            width: 270px;
+        }
+
+        .items .label1 {
+            width: 80px;
+            vertical-align: top;
+        }
+
+        .items .content {
+            width: 70px;
+        }
+
+        .item {
+            border-top: 1px solid #eee;
+        }
+    </style>
+</head>
+<body>
+<div class="main">
+    <h1 class="site-h1"><i class="layui-icon">&#xe656;</i>化学试剂检索</h1>
+    <form class="layui-form">
+        <div class="layui-form-item">
+            <div class="input-opt">
+                <select name="condition" lay-verify="required">
+                    <option value="isbn">试剂编号</option>
+<!--                    <option value="categoryName">分类</option>-->
+                    <option value="name">名称</option>
+                </select>
+            </div>
+            <div class="input-text">
+                <input type="text" name="keyword" required lay-verify="required" placeholder="请输入" autocomplete="off"
+                       class="layui-input">
+            </div>
+
+        </div>
+
+        <div class="layui-form-item">
+            <button class="layui-btn layui-btn-submit" lay-submit="" lay-filter="formDemo">搜索</button>
+        </div>
+        <div class="layui-form-item2">
+            <button class="layui-btn layui-btn-submit2" lay-submit="" lay-filter="formDemo2">生成二维码</button>
+        </div>
+    </form>
+
+    <!-- 列表 -->
+    <div class="booklist">
+        <table class="items">
+        </table>
+        <!--分页-->
+        <div id="pager"></div>
+    </div>
+
+</div>
+
+<script src="/static/js/jquery-1.11.3.min.js" th:src="@{/static/js/jquery-1.11.3.min.js}"></script>
+<script src="/static/layui/layui.js" th:src="@{/static/layui/layui.js}"></script>
+<script th:src="@{/static/js/util.js}"></script>
+
+<!--ctx-->
+<script th:replace="~{fragment::ctx}"/>
+
+<script>
+    var form, laypage;
+    // 请求参数
+    var param = {};
+    var param2 = {};
+
+    layui.use(['form','laypage','jquery'], function () {
+        form = layui.form;
+        laypage = layui.laypage, $ = layui.$;
+
+        form.on('submit(formDemo2)', function (data){
+            param2.name = "";
+            param2.isbn = "";
+            param2.categoryName = "";
+            if (data.field.condition == "isbn") {
+                param2.isbn = data.field.keyword;
+            }
+            if (data.field.condition == "name") {
+                param2.name = data.field.keyword;
+            }
+            if (data.field.condition == "categoryName") {
+                param2.categoryName = data.field.keyword;
+            }
+            showRecord2(1,5,param2);
+
+            return false;
+        });
+        //监听提交
+        form.on('submit(formDemo)', function (data) {
+            param.name = "";
+            param.isbn = "";
+            param.categoryName = "";
+
+            if (data.field.condition == "isbn") {
+                param.isbn = data.field.keyword;
+            }
+            if (data.field.condition == "name") {
+                param.name = data.field.keyword;
+            }
+            if (data.field.condition == "categoryName") {
+                param.categoryName = data.field.keyword;
+            }
+            showRecord(1,5,param);
+
+            return false;
+
+        });
+
+    });
+
+    function showRecord2(pageNo, pageSize, param) {
+        $.get(ctx+"api/book/list",
+            {
+                categoryName: param.categoryName,
+                name: param.name,
+                isbn: param.isbn,
+                page: pageNo,
+                limit: pageSize
+            },
+            function (result) {
+                //console.log(JSON.stringify(result));
+                // 展示数据
+                fillPage2(pageNo, pageSize, result.data);
+                // 渲染分页;
+            }
+        );
+    }
+
+    function showRecord(pageNo, pageSize, param) {
+        $.get(ctx+"api/book/list",
+            {
+                categoryName: param.categoryName,
+                name: param.name,
+                isbn: param.isbn,
+                page: pageNo,
+                limit: pageSize
+            },
+            function (result) {
+                //console.log(JSON.stringify(result));
+                // 展示数据
+                fillPage(pageNo, pageSize, result.data);
+                // 渲染分页
+                laypage.render({
+                    elem: $('#pager')
+                    ,count: result.count            //数据总数，从服务端得到
+                    , limit: 5                      //每页显示条数
+                    , limits: [5, 10, 15]
+                    , curr: 1                        //起始页
+                    , groups: 5                      //连续页码个数
+                    , prev: '上一页'                 //上一页文本
+                    , netx: '下一页'                 //下一页文本
+                    , first: 1                      //首页文本
+                    , last: 100                     //尾页文本
+                    , layout: ['prev', 'page', 'next','limit','skip']
+                    //跳转页码时调用
+                    , jump: function (obj, first) { //obj为当前页的属性和方法，第一次加载first为true
+                        //非首次加载 do something
+                        if (!first) {
+                            //调用加载函数加载数据
+                            getPage(obj.curr,obj.limit,param);
+                        }
+                    }
+                });
+            }
+        );
+    }
+
+    function getPage(pageNo, pageSize, param) {
+        var result1;
+        $.get(ctx+"api/book/list",
+            {
+                categoryName: param.categoryName,
+                name: param.name,
+                isbn: param.isbn,
+                page: pageNo,
+                limit: pageSize
+            },
+            function (result) {
+                fillPage(pageNo, pageSize, result.data);
+            }
+        );
+    }
+
+    function fillPage2(pageNo, pageSize, data) {
+        var start=pageNo==1?1:(pageNo-1)*pageSize+1;
+        $('.items').empty();
+        //加载后台返回的List集合数据
+        var href="";
+        var temp="";
+        for (var i = 0; i < data.length; i++) {
+            href=ctx+"bookDetail/"+data[i].id;
+            temp = data[i].imgPath;
+            var td = $("<td class='col'></td>").text(data[i].name);
+            var td2;
+            //td2 = $("<td class='cover2'><a href='"+href+"' target='_blank'><img src='static/img/bookDetail/"+data[i].id+".png'></a></td>");
+            td2 = $("<td class='cover2'><a href='"+href+"' target='_blank'><img src='static/img/bookDetail/Qrcode_"+data[i].id+".png'></a></td>");
+            /*if(isEmpty(data[i].imgPath)){
+                td2 = $("<td class='cover2'><a href='"+href+"' target='_blank'><img src='static/img/nopic.png'></a></td>");
+            }else{
+                td2 = $("<td class='cover2'><a href='"+href+"' target='_blank'><img src='static/img/"+data[i].imgPath+"/.png'></a></td>");
+            }*/
+            var tr = $("<tr class='item'></tr>").append(td, td2);
+
+            $('.items').append(tr);
+        }
+    }
+
+    function fillPage(pageNo, pageSize, data) {
+        var start=pageNo==1?1:(pageNo-1)*pageSize+1;
+        $('.items').empty();
+        //加载后台返回的List集合数据
+        var href="";
+        for (var i = 0; i < data.length; i++) {
+            href=ctx+"bookDetail/"+data[i].id;
+            var td = $("<td class='col1'></td>").text(start+i);
+            var td2;
+            if(isEmpty(data[i].imgPath)){
+                td2 = $("<td class='cover'><a href='"+href+"' target='_blank'><img src='static/img/nopic.png'></a></td>");
+            }else{
+                td2 = $("<td class='cover'><a href='"+href+"' target='_blank'><img src='"+data[i].imgPath+"'></a></td>");
+            }
+            var td3 = $("<td class='col2'></td>");
+            var div = $("<div class='itemtitle'><a href='"+href+"' target='_blank'>"+data[i].name+"</a></div>");
+            var tb = $("<table><tr><td class='label1'>分类:</td><td class='content'>"+data[i].categoryName+"</td>" +
+                "<td class='label1'>试剂编号：</td><td class='content'>"+data[i].isbn+"</td></tr></table>")
+            td3.append(div,tb);
+            var tr = $("<tr class='item'></tr>").append(td, td2, td3);
+
+            $('.items').append(tr);
+        }
+    }
+
+</script>
+</body>
+</html>

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>试剂详情</title>
+
+    <link rel="stylesheet" href="/static/layui/css/layui.css" th:href="@{/static/layui/css/layui.css}">
+
+    <script src="/static/js/jquery-1.11.3.min.js" th:src="@{/static/js/jquery-1.11.3.min.js}"></script>
+    <script src="/static/layui/layui.all.js" th:src="@{static/layui/layui.all.js}"></script>
+</head>
+<body>
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md6 layui-col-md-offset3">
+            <div class="layui-card">
+                <div class="layui-card-body">
+                    <table class="layui-table">
+                        <thead>
+                            <tr class="layui-bg-green">
+                                <td colspan="2" th:text="${book.name}">《安娜·卡列尼娜》</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>试剂编号</td>
+                                <td th:text="${book.isbn}">1223</td>
+                            </tr>
+                            <tr>
+                                <td>分类</td>
+                                <td th:text="${book.categoryName}">列夫·托尔斯泰</td>
+                            </tr>
+                            <tr>
+                                <td>定价</td>
+                                <td th:text="${book.price}">29.0</td>
+                            </tr>
+                            <tr>
+                                <td>存放位置</td>
+                                <td th:text="${book.locationName}">2</td>
+                            </tr>
+                            <tr>
+                                <td>剩余</td>
+                                <td th:text="${book.leftNumber}">2</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+</body>
+</html>
