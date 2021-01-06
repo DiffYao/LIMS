@@ -268,3 +268,4 @@ CREATE TABLE `tb_user` (
 -- Records of tb_user
 -- ----------------------------
 INSERT INTO `tb_user` VALUES ('admin', 'e3d0c85bf9d69d7ff11c1440a870d6c7');
+
