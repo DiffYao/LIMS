@@ -47,6 +47,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
         registry.addViewController("/bookLanguage").setViewName("bookLanguage");
         registry.addViewController("/bookPublisher").setViewName("bookPublisher");
         registry.addViewController("/bookShelf").setViewName("bookShelf");
+        registry.addViewController("/bookLab").setViewName("bookLab");
         registry.addViewController("/bookReader").setViewName("bookReader");
         registry.addViewController("/bookStat").setViewName("bookStat");
     }

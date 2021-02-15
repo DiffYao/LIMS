@@ -1,0 +1,68 @@
+<!-- html5的页面  -->
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- 设置当前页面字符集，告诉浏览器使用该字符集进行解码 -->
+    <meta charset="UTF-8" />
+    <title>Hello World</title>
+</head>
+<body>
+
+<!-- 网页中的主要内容 -->
+<h1>我的第一个网页</h1>
+
+<!-- 换行标签 -->
+<br/>
+
+<!-- 使用a标签创建一个超链接
+    1.href属性：以盘符开头的一个完整的路径
+        绝对路径：以盘符开头的一个完整路径
+        相对路径:相对于当前页面所在的路径
+        在相对路径中通过 ../返回上一级目录，返回多级目录使用多个 ../
+    2.target属性：用来设置跳转的页面在何处打开
+        _self:默认在当前标签页打开
+        _blank:在新的标签页打开
+-->
+<a href="pages/target.html">点击抽中新皮肤(当前页)</a><br/>
+<a href="pages/target.html" target="_blank">点击抽中新皮肤(新的一页)</a><br/>
+
+<!-- 通过table创建一个表格 -->
+<table border ="1">
+    <tr>
+        <th>姓名</th>
+        <th>阵营</th>
+        <th>职业</th>
+        <th>武器</th>
+    </tr>
+    <tr>
+        <td>钟无艳</td>
+        <!--跨行合并单元格： rowspan  -->
+        <td rowspan="3">魏</td>
+        <td>坦克</td>
+        <td>锤子</td>
+    </tr>
+    <tr>
+        <td>蔡文姬</td>
+        <!-- <td>魏</td> -->
+        <!-- 跨列合并单元格：colspan -->
+        <td colspan="2" align="left">辅助</td>
+        <!-- <td>琴</td> -->
+    </tr>
+    <tr>
+        <td>庄周</td>
+        <!-- <td>魏</td> -->
+        <td>辅助</td>
+        <td>大鱼</td>
+    </tr>
+</table>
+<br/>
+
+<!-- 表单 -->
+<form action="pages/success.html" method="get">
+    用户名：<input type="text" name ="userName"></inptu>
+    密码：<input type="password" name = "password">
+    <input type="submit" value="点击提交表单">
+</form>
+
+</body>
+</html>
